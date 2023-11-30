@@ -42,6 +42,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4.1.1
       - name: Choco cache
+        shell: pwsh
         run: |
           if (!Test-Path $env:CHOCO_CACHE_DIR) {
             mkdir $env:CHOCO_CACHE_DIR
