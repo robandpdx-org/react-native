@@ -40,26 +40,23 @@ jobs:
     env:
       CHOCO_CACHE_DIR: "C:\\ChocoCache"
     steps:
-      - run: |
-          echo "THIS_REF=$GITHUB_REF_NAME" >> $GITHUB_ENV
-          echo "THIS_JOB=$GITHUB_JOB" >> $GITHUB_ENV
       - name: Restore git cache
         uses: actions/cache/restore@v3.3.2
         with:
           path: .git
-          key: v1-checkout-checkout-${{ runner.arch }}-${{ env.THIS_REF }}-${{ github.sha }}
+          key: v1-checkout-checkout-${{ runner.arch }}-${{ github.ref }}-${{ github.sha }}
       - name: Checkout
         uses: actions/checkout@v4.1.1
       - name: Save git cache
         uses: actions/cache/save@v3.3.2
         with:
           path: .git
-          key: v1-checkout-checkout-${{ runner.arch }}-${{ env.THIS_REF }}-${{ github.sha }}
+          key: v1-checkout-checkout-${{ runner.arch }}-${{ github.ref }}-${{ github.sha }}
       - name: Restore choco cache
         uses: actions/cache/restore@v3.3.2
         with:
           path: ${{ env.CHOCO_CACHE_DIR }}
-          key: v1-win-choco-cache-${{ env.THIS_JOB }}
+          key: v1-win-choco-cache-${{ github.job }}
       - name: Configure choco cache
         shell: pwsh
         run: |
@@ -80,7 +77,7 @@ jobs:
         uses: actions/cache/save@v3.3.2
         with:
           path: ${{ env.CHOCO_CACHE_DIR }}
-          key: v1-win-choco-cache-${{ env.THIS_JOB }}
+          key: v1-win-choco-cache-${{ github.job }}
       - name: Flow check
         run: yarn flow-check
       - name: "Run Tests: JavaScript Tests"
