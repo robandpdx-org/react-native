@@ -31,7 +31,7 @@ jobs:
         with:
           platform: "js"
       - name: "Store test results"
-        uses: actions/upload-artifact@v2.2.4
+        uses: actions/upload-artifact@v3.1.3
         with:
           name: test-results
           path: ./reports/junit
@@ -43,15 +43,20 @@ jobs:
       - run: |
           echo "THIS_REF=$GITHUB_REF_NAME" >> $GITHUB_ENV
           echo "THIS_JOB=$GITHUB_JOB" >> $GITHUB_ENV
-      - name: Cache git
-        uses: actions/cache@v3.3.2
+      - name: Restore git cache
+        uses: actions/cache/restore@v3.3.2
         with:
           path: .git
           key: v1-checkout-checkout-${{ runner.arch }}-${{ env.THIS_REF }}-${{ github.sha }}
       - name: Checkout
         uses: actions/checkout@v4.1.1
-      - name: Cache choco
-        uses: actions/cache@v3.3.2
+      - name: Save git cache
+        uses: actions/cache/save@v3.3.2
+        with:
+          path: .git
+          key: v1-checkout-checkout-${{ runner.arch }}-${{ env.THIS_REF }}-${{ github.sha }}
+      - name: Restore choco cache
+        uses: actions/cache/restore@v3.3.2
         with:
           path: ${{ env.CHOCO_CACHE_DIR }}
           key: v1-win-choco-cache-${{ env.THIS_JOB }}
@@ -71,6 +76,11 @@ jobs:
           envinfo
       - name: "Yarn: Install Dependencies"
         run: yarn install --frozen-lockfile --non-interactive
+      - name: Save choco cache
+        uses: actions/cache/save@v3.3.2
+        with:
+          path: ${{ env.CHOCO_CACHE_DIR }}
+          key: v1-win-choco-cache-${{ env.THIS_JOB }}
       - name: Flow check
         run: yarn flow-check
       - name: "Run Tests: JavaScript Tests"
