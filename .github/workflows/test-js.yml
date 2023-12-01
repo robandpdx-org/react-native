@@ -81,4 +81,7 @@ jobs:
       - name: Flow check
         run: yarn flow-check
       - name: "Run Tests: JavaScript Tests"
-        run: yarn test
+        run: |
+          cd ..
+          cd D:\a\react-native\react-native
+          yarn test
