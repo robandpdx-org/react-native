@@ -42,7 +42,7 @@ jobs:
     steps:
       - run: |
           echo "THIS_REF=$GITHUB_REF_NAME" >> $GITHUB_ENV
-          ehco "THIS_JOB=$GITHUB_JOB" >> $GITHUB_ENV
+          echo "THIS_JOB=$GITHUB_JOB" >> $GITHUB_ENV
       - name: Cache git
         uses: actions/cache@v3.3.2
         with:
