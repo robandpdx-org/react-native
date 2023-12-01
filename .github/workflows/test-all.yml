@@ -1,0 +1,48 @@
+name: test-all
+
+on:
+    workflow_dispatch:
+    pull_request:
+
+jobs:
+  prepare_package_for_release:
+    runs-on: macos-12
+    steps:
+      - uses: actions/checkout@v4.1.1
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4.0.0
+        with:
+          node-version: 18
+          cache: 'yarn'
+      - name: Install dependencies
+        run: yarn install --non-interactive
+      - name: "Set new react-native version and commit changes"
+        run: |
+          VERSION=''
+          LATEST=false
+          DRYRUN=true
+          node ./scripts/prepare-package-for-release.js -v "$VERSION" -l $LATEST --dry-run $DRYRUN
+  build_hermesc_apple:
+    runs-on: macos-12
+    needs: prepare_package_for_release
+    env:
+      HERMES_WS_DIR: /tmp/hermes
+      HERMES_TARBALL_ARTIFACTS_DIR: /tmp/hermes/hermes-runtime-darwin
+    steps:
+      - uses: actions/cache@v3.3.2
+        with:
+          path: $HERMES_WS_DIR
+          key: hermes
+      - name: Restore git cache
+        uses: actions/cache/restore@v3.3.2
+        with:
+          path: .git
+          key: v1-checkout-checkout-${{ runner.arch }}-${{ github.ref }}-${{ github.sha }}
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
+      - name: Save git cache
+        uses: actions/cache/save@v3.3.2
+        with:
+          path: .git
+          key: v1-checkout-checkout-${{ runner.arch }}-${{ github.ref }}-${{ github.sha }}
+  ## to be continued...
