@@ -60,7 +60,7 @@ jobs:
       - name: Configure choco cache
         shell: pwsh
         run: |
-          mkdir $env:CHOCO_CACHE_DIR
+          if not exists $env:CHOCO_CACHE_DIR mkdir $env:CHOCO_CACHE_DIR
           choco config set --name cacheLocation --value $env:CHOCO_CACHE_DIR
       - uses: actions/setup-node@v4.0.0
         with:
