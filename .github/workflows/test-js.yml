@@ -40,24 +40,22 @@ jobs:
     env:
       CHOCO_CACHE_DIR: "C:\\ChocoCache"
     steps:
-      - name: Restore Cache
-        uses: actions/cache/restore@v3.3.2
+      - run: |
+          echo "THIS_REF=$GITHUB_REF_NAME" >> $GITHUB_ENV
+          ehco "THIS_JOB=$GITHUB_JOB" >> $GITHUB_ENV
+      - name: Cache git
+        uses: actions/cache@v3.3.2
         with:
           path: .git
-          key: v1-checkout-checkout-${{ runner.arch }}-${{ env.GITHUB_REF_NAME }}-${{ github.sha }}
+          key: v1-checkout-checkout-${{ runner.arch }}-${{ env.THIS_REF }}-${{ github.sha }}
       - name: Checkout
         uses: actions/checkout@v4.1.1
-      - name: Save Cache
-        uses: actions/cache/save@v3.3.2
-        with:
-          path: .git
-          key: v1-checkout-checkout-${{ runner.arch }}-${{ env.GITHUB_REF_NAME }}-${{ github.sha }}
-      - name: Restore Cache
-        uses: actions/cache/restore@v3.3.2
+      - name: Cache choco
+        uses: actions/cache@v3.3.2
         with:
           path: ${{ env.CHOCO_CACHE_DIR }}
-          key: v1-win-choco-cache-${{ env.GITHUB_JOB }}
-      - name: Choco cache
+          key: v1-win-choco-cache-${{ env.THIS_JOB }}
+      - name: Configure choco cache
         shell: pwsh
         run: |
           mkdir $env:CHOCO_CACHE_DIR
@@ -73,11 +71,6 @@ jobs:
           envinfo
       - name: "Yarn: Install Dependencies"
         run: yarn install --frozen-lockfile --non-interactive
-      - name: Save Cache
-        uses: actions/cache/save@v3.3.2
-        with:
-          path: ${{ env.CHOCO_CACHE_DIR }}
-          key: v1-win-choco-cache-${{ env.GITHUB_JOB }}
       - name: Flow check
         run: yarn flow-check
       - name: "Run Tests: JavaScript Tests"
