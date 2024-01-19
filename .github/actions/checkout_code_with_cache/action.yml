@@ -1,0 +1,17 @@
+name: checkout_code_with_cache
+description: "Checkout code with cache"
+runs:
+  using: composite
+  steps:
+    - name: Restore Cache
+      uses: actions/cache/restore@v3.3.2
+      with:
+        path: .git
+        key: v1-checkout-checkout-${{ runner.arch }}-${{ env.GITHUB_REF_NAME }}-${{ github.sha }}
+    - name: Checkout
+      uses: actions/checkout@v4.1.1
+    - name: Save Cache
+      uses: actions/cache/save@v3.3.2
+      with:
+        path: .git
+        key: v1-checkout-checkout-${{ runner.arch }}-${{ env.GITHUB_REF_NAME }}-${{ github.sha }}
