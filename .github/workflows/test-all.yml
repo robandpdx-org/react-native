@@ -29,13 +29,13 @@ jobs:
       HERMES_VERSION_FILE: packages/react-native/sdks/.hermesversion
       BUILD_FROM_SOURCE: true
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
       - name: Use Node.js 18
         uses: actions/setup-node@v4.0.0
         with:
           node-version: 18
           cache: 'yarn'
-      - name: Checkout
-        uses: actions/checkout@v4.1.1
       - name: Setup hermes version
         run: |
           mkdir -p "/tmp/hermes" "/tmp/hermes/download" "/tmp/hermes/hermes"
@@ -84,6 +84,7 @@ jobs:
 
   build_hermesc_apple:
     runs-on: macos-12
+    needs: prepare_hermes_workspace
     env:
       HERMES_WS_DIR: /tmp/hermes
       HERMES_TARBALL_ARTIFACTS_DIR: /tmp/hermes/hermes-runtime-darwin
