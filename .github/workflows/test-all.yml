@@ -22,9 +22,68 @@ jobs:
           LATEST=false
           DRYRUN=true
           node ./scripts/prepare-package-for-release.js -v "$VERSION" -l $LATEST --dry-run $DRYRUN
+  prepare_hermes_workspace:
+    runs-on: ubuntu-latest
+    env:
+      HERMES_WS_DIR: /tmp/hermes
+      HERMES_VERSION_FILE: packages/react-native/sdks/.hermesversion
+      BUILD_FROM_SOURCE: true
+    steps:
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4.0.0
+        with:
+          node-version: 18
+          cache: 'yarn'
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
+      - name: Setup hermes version
+        run: |
+          mkdir -p "/tmp/hermes" "/tmp/hermes/download" "/tmp/hermes/hermes"
+
+          if [ -f "$HERMES_VERSION_FILE" ]; then
+            echo "Hermes Version file found! Using this version for the build:"
+            cat $HERMES_VERSION_FILE > /tmp/hermes/hermesversion
+          else
+            echo "Hermes Version file not found!!!"
+            echo "Using the last commit from main for the build:"
+            HERMES_TAG_SHA=$(git ls-remote https://github.com/$GITHUB_REPOSITORY main | cut -f 1 | tr -d '[:space:]')
+            echo $HERMES_TAG_SHA > /tmp/hermes/hermesversion
+          fi
+          cat /tmp/hermes/hermesversion
+      - name: Get react-native version
+        run: |
+          VERSION=$(cat packages/react-native/package.json | jq -r '.version')
+          # Save the react native version we are building in a file so we can use that file as part of the cache key.
+          echo "$VERSION" > /tmp/react-native-version
+          echo "React Native Version is $(cat /tmp/react-native-version)"
+          HERMES_VERSION="$(cat /tmp/hermes/hermesversion)"
+          echo "Hermes commit is $HERMES_VERSION"
+      - name: Cache hermes workspace
+        uses: actions/cache@v2.1.6
+        with:
+          path: |
+            /tmp/hermes/download/
+            /tmp/hermes/hermes/
+          key: v5-hermes-${{ github.job }}-${{ hashfiles('/tmp/hermes/hermesversion') }}
+      - name: Yarn- Install Dependencies
+        if: ${{ contains(github.event.head_commit.message, 'Bump metro@') }}
+        run: yarn install --non-interactive
+      - name: Download Hermes tarball
+        run: |
+          node packages/react-native/scripts/hermes/prepare-hermes-for-build $CIRCLE_PULL_REQUEST
+          cp packages/react-native/sdks/download/* $HERMES_WS_DIR/download/.
+          cp -r packages/react-native/sdks/hermes/* $HERMES_WS_DIR/hermes/.
+
+          cat /tmp/hermes/hermesversion
+      - name: Hermes tarball cache
+        uses: actions/cache@v2.1.6
+        with:
+          path: /tmp/hermes/download/
+          key: v4-hermes-tarball-release-${{ hashfiles('/tmp/hermes/hermesversion', '/tmp/react-native-version', 'packages/react-native/sdks/hermes-engine/utils/build-apple-framework.sh') }}
+
+
   build_hermesc_apple:
     runs-on: macos-12
-    needs: prepare_package_for_release
     env:
       HERMES_WS_DIR: /tmp/hermes
       HERMES_TARBALL_ARTIFACTS_DIR: /tmp/hermes/hermes-runtime-darwin
@@ -33,16 +92,30 @@ jobs:
         with:
           path: $HERMES_WS_DIR
           key: hermes
-      - name: Restore git cache
-        uses: actions/cache/restore@v3.3.2
+      - uses: ./.github/actions/checkout_code_with_cache
+      - name: Get React Native version
+        run: |
+          VERSION=$(cat packages/react-native/package.json | jq -r '.version')
+          # Save the react native version we are building in a file so we can use that file as part of the cache key.
+          echo "$VERSION" > /tmp/react-native-version
+          echo "React Native Version is $(cat /tmp/react-native-version)"
+          HERMES_VERSION="$(cat /tmp/hermes/hermesversion)"
+          echo "Hermes commit is $HERMES_VERSION"
+
+      ## This above step needs to be put into it's own action, and it needs to set an output for the value of the react native version.  
+      - name: Setup Hermes workspace
+        run: |
+          mkdir -p $HERMES_OSXBIN_ARTIFACTS_DIR ./packages/react-native/sdks/hermes
+          cp -r $HERMES_WS_DIR/hermes/* ./packages/react-native/sdks/hermes/.
+          cp -r ./packages/react-native/sdks/hermes-engine/utils ./packages/react-native/sdks/hermes/.
+
+      - name: Hermes apple cache
+        uses: actions/cache@v2.1.6
         with:
-          path: .git
-          key: v1-checkout-checkout-${{ runner.arch }}-${{ github.ref }}-${{ github.sha }}
-      - name: Checkout
-        uses: actions/checkout@v4.1.1
-      - name: Save git cache
-        uses: actions/cache/save@v3.3.2
-        with:
-          path: .git
-          key: v1-checkout-checkout-${{ runner.arch }}-${{ github.ref }}-${{ github.sha }}
-  ## to be continued...
+          path: ./packages/react-native/sdks/hermes/build_host_hermesc
+          key: v2-hermesc-apple-${{ hashfiles('/tmp/hermes/hermesversion', '/tmp/react-native-version') }}
+      - name: "Build HermesC Apple"
+        run: |
+          cd ./packages/react-native/sdks/hermes || exit 1
+          . ./utils/build-apple-framework.sh
+          build_host_hermesc_if_needed
