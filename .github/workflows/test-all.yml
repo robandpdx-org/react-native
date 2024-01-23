@@ -110,7 +110,7 @@ jobs:
           path: .git
           key: v1-checkout-checkout-${{ runner.arch }}-${{ github.ref }}-${{ github.sha }}
       - name: Setup Hermes workspace
-        uses: ./.github/actions/setup-hermes-workspace
+        uses: ./.github/actions/setup_hermes_workspace
       - name: Hermes apple cache
         uses: actions/cache@v4.0.0
         with:
@@ -151,7 +151,7 @@ jobs:
           path: .git
           key: v1-checkout-checkout-${{ runner.arch }}-${{ github.ref }}-${{ github.sha }}
       - name: Setup Hermes workspace
-        uses: ./.github/actions/setup-hermes-workspace
+        uses: ./.github/actions/setup_hermes_workspace
       - name: Hermes apple cache
         uses: actions/cache@v4.0.0
         with:
