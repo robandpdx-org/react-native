@@ -18,9 +18,10 @@ jobs:
         run: yarn install --non-interactive
       - name: "Set new react-native version and commit changes"
         run: |
-          VERSION=''
           LATEST=false
           DRYRUN=true
+          VERSION=$(grep '"version"' package.json | cut -d '"' -f 4 | head -1)
+          echo "Using the version from the package.json: $VERSION"
           node ./scripts/prepare-package-for-release.js -v "$VERSION" -l $LATEST --dry-run $DRYRUN
   prepare_hermes_workspace:
     runs-on: ubuntu-latest
@@ -93,7 +94,22 @@ jobs:
         with:
           path: $HERMES_WS_DIR
           key: hermes
-      - uses: ./.github/actions/checkout_code_with_cache
+      - uses: actions/cache@v3.3.2
+        with:
+          path: $HERMES_WS_DIR
+          key: hermes
+      - name: Restore git cache
+        uses: actions/cache/restore@v3.3.2
+        with:
+          path: .git
+          key: v1-checkout-checkout-${{ runner.arch }}-${{ github.ref }}-${{ github.sha }}
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
+      - name: Save git cache
+        uses: actions/cache/save@v3.3.2
+        with:
+          path: .git
+          key: v1-checkout-checkout-${{ runner.arch }}-${{ github.ref }}-${{ github.sha }}
       - name: Get React Native version
         run: |
           VERSION=$(cat packages/react-native/package.json | jq -r '.version')
