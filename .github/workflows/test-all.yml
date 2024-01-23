@@ -40,6 +40,11 @@ jobs:
         with:
           node-version: 18
           cache: 'yarn'
+      - name: Cache hermes workspace
+        uses: actions/cache@v3.3.2
+        with:
+          path: /tmp/hermes
+          key: hermes
       - name: Setup hermes version
         id: hermes-version
         run: |
@@ -68,7 +73,7 @@ jobs:
           path: |
             /tmp/hermes/download/
             /tmp/hermes/hermes/
-          key: v5-hermes-${{ github.job }}-${{ hashfiles('/tmp/hermes/hermesversion') }}
+          key: v5-hermes-${{ github.job }}-${{ steps.hermes-version.outputs.version }}
       - name: Yarn- Install Dependencies
         if: ${{ contains(github.event.head_commit.message, 'Bump metro@') }}
         run: yarn install --non-interactive
@@ -87,7 +92,8 @@ jobs:
       HERMES_WS_DIR: /tmp/hermes
       HERMES_TARBALL_ARTIFACTS_DIR: /tmp/hermes/hermes-runtime-darwin
     steps:
-      - uses: actions/cache@v3.3.2
+      - name: Cache hermes workspace
+        uses: actions/cache@v3.3.2
         with:
           path: /tmp/hermes
           key: hermes
