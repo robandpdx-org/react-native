@@ -156,7 +156,7 @@ jobs:
         id: check_if_apple_artifacts_are_there
         uses: ./.github/actions/check_if_apple_artifacts_are_there
       - name: Build the Hermes ${{ matrix.slice }} frameworks
-        if: ${{ steps.check_if_apple_artifacts_are_there.outputs.artifacts_exist == 'false' }}
+        if: ${{ steps.check_if_apple_artifacts_are_there.outputs.artifacts_exist == false }}
         run: |
           cd ./packages/react-native/sdks/hermes || exit 1
           SLICE=${{ matrix.slice }}
@@ -233,34 +233,34 @@ jobs:
         id: check_if_apple_artifacts_are_there
         uses: ./.github/actions/check_if_apple_artifacts_are_there
       - name: Yarn- Install Dependencies
-        if: ${{ contains(github.event.head_commit.message, 'Bump metro@') && steps.check_if_apple_artifacts_are_there.outputs.artifacts_exist == 'false' }}
+        if: ${{ contains(github.event.head_commit.message, 'Bump metro@') && steps.check_if_apple_artifacts_are_there.outputs.artifacts_exist == false }}
         run: yarn install --non-interactive
       - name: Slice cache macosx
-        if: ${{ steps.check_if_apple_artifacts_are_there.outputs.artifacts_exist == 'false' }}
+        if: ${{ steps.check_if_apple_artifacts_are_there.outputs.artifacts_exist == false }}
         uses: actions/cache@v4.0.0
         with:
           path: ./packages/react-native/sdks/hermes/build_macosx_${{ matrix.flavor }}
           key: v4-hermes-apple-build_macosx_-${{ matrix.flavor }}
       - name: Slice cache iphoneos
-        if: ${{ steps.check_if_apple_artifacts_are_there.outputs.artifacts_exist == 'false' }}
+        if: ${{ steps.check_if_apple_artifacts_are_there.outputs.artifacts_exist == false }}
         uses: actions/cache@v4.0.0
         with:
           path: ./packages/react-native/sdks/hermes/build_iphoneos_${{ matrix.flavor }}
           key: v4-hermes-apple-build_iphoneos_-${{ matrix.flavor }}
       - name: Slice cache iphonesimulator
-        if: ${{ steps.check_if_apple_artifacts_are_there.outputs.artifacts_exist == 'false' }}
+        if: ${{ steps.check_if_apple_artifacts_are_there.outputs.artifacts_exist == false }}
         uses: actions/cache@v4.0.0
         with:
           path: ./packages/react-native/sdks/hermes/build_iphonesimulator_${{ matrix.flavor }}
           key: v4-hermes-apple-build_iphonesimulator_-${{ matrix.flavor }}
       - name: Slice cache catalyst
-        if: ${{ steps.check_if_apple_artifacts_are_there.outputs.artifacts_exist == 'false' }}
+        if: ${{ steps.check_if_apple_artifacts_are_there.outputs.artifacts_exist == false }}
         uses: actions/cache@v4.0.0
         with:
           path: ./packages/react-native/sdks/hermes/build_catalyst_${{ matrix.flavor }}
           key: v4-hermes-apple-build_catalyst_-${{ matrix.flavor }}
       - name: Move back build folders
-        if: ${{ steps.check_if_apple_artifacts_are_there.outputs.artifacts_exist == 'false' }}
+        if: ${{ steps.check_if_apple_artifacts_are_there.outputs.artifacts_exist == false }}
         run: |
           cd ./packages/react-native/sdks/hermes || exit 1
           mv build_macosx_${{ matrix.flavor }} build_macosx
@@ -268,19 +268,19 @@ jobs:
           mv build_iphonesimulator_${{ matrix.flavor }} build_iphonesimulator
           mv build_catalyst_${{ matrix.flavor }} build_catalyst
       - name: "Prepare destroot folder"
-        if: ${{ steps.check_if_apple_artifacts_are_there.outputs.artifacts_exist == 'false' }}
+        if: ${{ steps.check_if_apple_artifacts_are_there.outputs.artifacts_exist == false }}
         run: |
           cd ./packages/react-native/sdks/hermes || exit 1
           . ./utils/build-apple-framework.sh
           prepare_dest_root_for_ci
       - name: "Create fat framework for iOS"
-        if: ${{ steps.check_if_apple_artifacts_are_there.outputs.artifacts_exist == 'false' }}
+        if: ${{ steps.check_if_apple_artifacts_are_there.outputs.artifacts_exist == false }}
         run: |
           cd ./packages/react-native/sdks/hermes || exit 1
           echo "[HERMES] Creating the universal framework"
           ./utils/build-ios-framework.sh build_framework
       - name: Package the Hermes Apple frameworks
-        if: ${{ steps.check_if_apple_artifacts_are_there.outputs.artifacts_exist == 'false' }}
+        if: ${{ steps.check_if_apple_artifacts_are_there.outputs.artifacts_exist == false }}
         run: |
           BUILD_TYPE="${{ matrix.flavor }}"
           echo "Packaging Hermes Apple frameworks for $BUILD_TYPE build type"
@@ -304,7 +304,7 @@ jobs:
           mkdir -p /tmp/hermes/osx-bin/${{ matrix.flavor }}
           cp ./packages/react-native/sdks/hermes/build_macosx/bin/* /tmp/hermes/osx-bin/${{ matrix.flavor }}
       - name: Create dSYM archive
-        if: ${{ steps.check_if_apple_artifacts_are_there.outputs.artifacts_exist == 'false' }}
+        if: ${{ steps.check_if_apple_artifacts_are_there.outputs.artifacts_exist == false }}
         run: |
           FLAVOR=${{ matrix.flavor }}
           WORKING_DIR="/tmp/hermes_tmp/dSYM/$FLAVOR"
