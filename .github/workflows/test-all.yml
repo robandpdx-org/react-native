@@ -99,6 +99,13 @@ jobs:
         with:
           path: .git
           key: v1-checkout-checkout-${{ runner.arch }}-${{ github.ref }}-${{ github.sha }}
+      - name: Cache hermes workspace
+        uses: actions/cache@v4.0.0
+        with:
+          path: |
+            /tmp/hermes/download/
+            /tmp/hermes/hermes/
+          key: v5-hermes-${{ github.job }}-${{ steps.hermes-version.outputs.version }}
       - name: Setup Hermes workspace
         uses: ./.github/actions/setup_hermes_workspace
       - name: Hermes apple cache
@@ -130,14 +137,14 @@ jobs:
           key: v1-checkout-checkout-${{ runner.arch }}-${{ github.ref }}-${{ github.sha }}
       - name: Checkout
         uses: actions/checkout@v4.1.1
-      - name: Setup Hermes workspace
-        uses: ./.github/actions/setup_hermes_workspace
       - name: Cache setup
         id: cache_setup
         uses: ./.github/actions/cache_setup
         with:
           hermes-version: ${{ needs.prepare_hermes_workspace.outputs.hermes-version }}
           react-native-version: ${{ needs.prepare_hermes_workspace.outputs.react-native-version }}
+      - name: Setup Hermes workspace
+        uses: ./.github/actions/setup_hermes_workspace
       - name: Check if the required artifacts already exist
         id: check_if_apple_artifacts_are_there
         run: |
@@ -227,14 +234,14 @@ jobs:
         with:
           node-version: 18
           cache: 'yarn'
-      - name: Setup Hermes workspace
-        uses: ./.github/actions/setup_hermes_workspace
       - name: Cache setup
         id: cache_setup
         uses: ./.github/actions/cache_setup
         with:
           hermes-version: ${{ needs.prepare_hermes_workspace.outputs.hermes-version }}
           react-native-version: ${{ needs.prepare_hermes_workspace.outputs.react-native-version }}
+      - name: Setup Hermes workspace
+        uses: ./.github/actions/setup_hermes_workspace
       - name: Check if the required artifacts already exist
         id: check_if_apple_artifacts_are_there
         run: |
