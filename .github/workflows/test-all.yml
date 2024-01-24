@@ -105,7 +105,7 @@ jobs:
           path: |
             /tmp/hermes/download/
             /tmp/hermes/hermes/
-          key: v5-hermes-${{ github.job }}-${{ steps.hermes-version.outputs.version }}
+          key: v5-hermes-${{ github.job }}-${{ needs.prepare_hermes_workspace.outputs.hermes-version }}
       - name: Setup Hermes workspace
         uses: ./.github/actions/setup_hermes_workspace
       - name: Hermes apple cache
