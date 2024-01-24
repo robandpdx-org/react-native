@@ -75,7 +75,7 @@ jobs:
             /tmp/hermes/hermes/
           key: v5-hermes-${{ github.job }}-${{ steps.hermes-version.outputs.version }}
       - name: Yarn- Install Dependencies
-        if: ${{ contains(github.event.head_commit.message, 'Bump metro@') }}
+        if: ${{ ! contains(github.event.head_commit.message, 'Bump metro@') }}
         run: yarn install --non-interactive
       - name: Download Hermes tarball
         run: |
@@ -233,7 +233,7 @@ jobs:
         id: check_if_apple_artifacts_are_there
         uses: ./.github/actions/check_if_apple_artifacts_are_there
       - name: Yarn- Install Dependencies
-        if: ${{ contains(github.event.head_commit.message, 'Bump metro@') && steps.check_if_apple_artifacts_are_there.outputs.artifacts_exist == false }}
+        if: ${{ ! contains(github.event.head_commit.message, 'Bump metro@') && steps.check_if_apple_artifacts_are_there.outputs.artifacts_exist == false }}
         run: yarn install --non-interactive
       - name: Slice cache macosx
         if: ${{ steps.check_if_apple_artifacts_are_there.outputs.artifacts_exist == false }}
@@ -267,13 +267,13 @@ jobs:
           mv build_iphoneos_${{ matrix.flavor }} build_iphoneos
           mv build_iphonesimulator_${{ matrix.flavor }} build_iphonesimulator
           mv build_catalyst_${{ matrix.flavor }} build_catalyst
-      - name: "Prepare destroot folder"
+      - name: Prepare destroot folder
         if: ${{ steps.check_if_apple_artifacts_are_there.outputs.artifacts_exist == false }}
         run: |
           cd ./packages/react-native/sdks/hermes || exit 1
           . ./utils/build-apple-framework.sh
           prepare_dest_root_for_ci
-      - name: "Create fat framework for iOS"
+      - name: Create fat framework for iOS
         if: ${{ steps.check_if_apple_artifacts_are_there.outputs.artifacts_exist == false }}
         run: |
           cd ./packages/react-native/sdks/hermes || exit 1
