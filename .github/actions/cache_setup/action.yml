@@ -77,4 +77,4 @@ runs:
         path: |
           /tmp/hermes/download/
           /tmp/hermes/hermes/
-        key: v5-hermes-${{ github.job }}-${{ inputs.hermes-version }}
+        key: v5-hermes-${{ github.run_number }}-${{ inputs.hermes-version }}
