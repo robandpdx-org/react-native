@@ -68,7 +68,7 @@ jobs:
           path: |
             /tmp/hermes/download/
             /tmp/hermes/hermes/
-          key: v5-hermes-${{ github.job }}-${{ steps.hermes-version.outputs.version }}
+          key: v5-hermes-${{ github.run_number }}-${{ steps.hermes-version.outputs.version }}
       - name: Yarn- Install Dependencies
         if: ${{ ! contains(github.event.head_commit.message, 'Bump metro@') }}
         run: yarn install --non-interactive
@@ -105,7 +105,7 @@ jobs:
           path: |
             /tmp/hermes/download/
             /tmp/hermes/hermes/
-          key: v5-hermes-${{ github.job }}-${{ needs.prepare_hermes_workspace.outputs.hermes-version }}
+          key: v5-hermes-${{ github.run_number }}-${{ needs.prepare_hermes_workspace.outputs.hermes-version }}
       - name: Setup Hermes workspace
         uses: ./.github/actions/setup_hermes_workspace
       - name: Hermes apple cache
