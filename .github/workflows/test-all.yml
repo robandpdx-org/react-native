@@ -355,5 +355,48 @@ jobs:
 
           mkdir -p "$DEST_DIR"
           mv "hermes.framework.dSYM" "$DEST_DIR"
-
+  test_ios_rntester_ruby_3_2_0:
+    runs-on: macos-12
+    needs: [build_apple_slices_hermes, prepare_hermes_workspace, build_hermes_macos]
+    env:
+      HERMES_WS_DIR: /tmp/hermes
+      HERMES_TARBALL_ARTIFACTS_DIR: /tmp/hermes/hermes-runtime-darwin
+    steps:
+      - name: Run it
+        uses: ./.github/actions/test_ios_rntester
+        with:
+          ruby_version: "3.2.0"
+  test_ios_rntester1:
+    runs-on: macos-12
+    needs: [build_apple_slices_hermes, prepare_hermes_workspace, build_hermes_macos]
+    env:
+      HERMES_WS_DIR: /tmp/hermes
+      HERMES_TARBALL_ARTIFACTS_DIR: /tmp/hermes/hermes-runtime-darwin
+    strategy:
+      matrix:
+        jsengine: [Hermes, JSC]
+    steps:
+      - name: Run it
+        uses: ./.github/actions/test_ios_rntester
+        with:
+          jsengine: ${{ matrix.jsengine }}
+          use_frameworks: DynamicFrameworks
+  test_ios_rntester2:
+    runs-on: macos-12
+    needs: [build_apple_slices_hermes, prepare_hermes_workspace, build_hermes_macos]
+    env:
+      HERMES_WS_DIR: /tmp/hermes
+      HERMES_TARBALL_ARTIFACTS_DIR: /tmp/hermes/hermes-runtime-darwin
+    strategy:
+      matrix:
+        jsengine: [Hermes, JSC]
+        architecture: [NewArch, OldArch]
+    steps:
+      - name: Run it
+        uses: ./.github/actions/test_ios_rntester
+        with:
+          jsengine: ${{ matrix.jsengine }}
+          architecture: ${{ matrix.architecture }}
+          run_unit_tests: true
+          use_frameworks: StaticLibraries
   

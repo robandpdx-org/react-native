@@ -1,0 +1,19 @@
+name: setup_xcode_build_cache
+description: Add caching to iOS jobs to speed up builds
+inputs:
+  podfile_lock_path:
+    description: Path to the Podfile.lock file
+    default: packages/rn-tester/Podfile.lock
+  pods_build_folder:
+    description: Path to the Pods build folder
+    default: packages/rn-tester/Pods
+  podfile_lock_cache_key:
+    description: Cache key for the Podfile.lock file
+    default: *rntester_podfile_lock_cache_key
+  cocoapods_cache_key:
+    description: Cache key for the Pods build folder
+    default: *cocoapods_cache_key
+runs:
+  using: composite
+  steps:
+    - name: See commands.yml with_xcodebuild_cache
