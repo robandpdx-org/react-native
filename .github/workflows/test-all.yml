@@ -201,7 +201,7 @@ jobs:
             echo "Please try again"
             exit 1
           fi
-      - name: Sace slice cache
+      - name: Save slice cache
         if: ${{ steps.check_if_apple_artifacts_are_there.outputs.ARTIFACTS_EXIST != true }}
         uses: actions/cache@v4.0.0
         with:
@@ -289,6 +289,7 @@ jobs:
       - name: Move back build folders
         if: ${{ steps.check_if_apple_artifacts_are_there.outputs.ARTIFACTS_EXIST != true }}
         run: |
+          ls -ltR ./packages/react-native/sdks/hermes
           cd ./packages/react-native/sdks/hermes || exit 1
           mv build_macosx_${{ matrix.flavor }} build_macosx
           mv build_iphoneos_${{ matrix.flavor }} build_iphoneos
