@@ -364,6 +364,7 @@ jobs:
         with:
           ruby_version: "3.2.0"
           hermes_version: ${{ needs.prepare_hermes_workspace.outputs.hermes-version }}
+          react-native-version: ${{ needs.prepare_hermes_workspace.outputs.react-native-version }}
   test_ios_rntester1:
     runs-on: macos-12
     needs: [build_apple_slices_hermes, prepare_hermes_workspace, build_hermes_macos]
@@ -385,8 +386,9 @@ jobs:
         uses: ./.github/actions/test_ios_rntester
         with:
           jsengine: ${{ matrix.jsengine }}
-          use_frameworks: DynamicFrameworks
-          hermes_version: ${{ needs.prepare_hermes_workspace.outputs.hermes-version }}
+          use-frameworks: DynamicFrameworks
+          hermes-version: ${{ needs.prepare_hermes_workspace.outputs.hermes-version }}
+          react-native-version: ${{ needs.prepare_hermes_workspace.outputs.react-native-version }}
   test_ios_rntester2:
     runs-on: macos-12
     needs: [build_apple_slices_hermes, prepare_hermes_workspace, build_hermes_macos]
@@ -410,6 +412,7 @@ jobs:
         with:
           jsengine: ${{ matrix.jsengine }}
           architecture: ${{ matrix.architecture }}
-          run_unit_tests: true
-          use_frameworks: StaticLibraries
-          hermes_version: ${{ needs.prepare_hermes_workspace.outputs.hermes-version }}
+          run-unit-tests: true
+          use-frameworks: StaticLibraries
+          hermes-version: ${{ needs.prepare_hermes_workspace.outputs.hermes-version }}
+          react-native-version: ${{ needs.prepare_hermes_workspace.outputs.react-native-version }}
