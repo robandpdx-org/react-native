@@ -87,18 +87,13 @@ jobs:
       HERMES_WS_DIR: /tmp/hermes
       HERMES_TARBALL_ARTIFACTS_DIR: /tmp/hermes/hermes-runtime-darwin
     steps:
-      - name: Restore git cache
-        uses: actions/cache/restore@v4.0.0
+      - name: git cache
+        uses: actions/cache@v4.0.0
         with:
           path: .git
           key: v1-checkout-checkout-${{ runner.arch }}-${{ github.ref }}-${{ github.sha }}
       - name: Checkout
         uses: actions/checkout@v4.1.1
-      - name: Save git cache
-        uses: actions/cache/save@v4.0.0
-        with:
-          path: .git
-          key: v1-checkout-checkout-${{ runner.arch }}-${{ github.ref }}-${{ github.sha }}
       - name: Cache hermes workspace
         uses: actions/cache@v4.0.0
         with:
@@ -217,18 +212,13 @@ jobs:
       matrix:
         flavor: [Debug, Release]
     steps:
-      - name: Restore git cache
+      - name: git cache
         uses: actions/cache/restore@v4.0.0
         with:
           path: .git
           key: v1-checkout-checkout-${{ runner.arch }}-${{ github.ref }}-${{ github.sha }}
       - name: Checkout
         uses: actions/checkout@v4.1.1
-      - name: Save git cache
-        uses: actions/cache/save@v4.0.0
-        with:
-          path: .git
-          key: v1-checkout-checkout-${{ runner.arch }}-${{ github.ref }}-${{ github.sha }}
       - name: Use Node.js 18
         uses: actions/setup-node@v4.0.0
         with:
@@ -362,6 +352,13 @@ jobs:
       HERMES_WS_DIR: /tmp/hermes
       HERMES_TARBALL_ARTIFACTS_DIR: /tmp/hermes/hermes-runtime-darwin
     steps:
+      - name: Restore git cache
+        uses: actions/cache/restore@v4.0.0
+        with:
+          path: .git
+          key: v1-checkout-checkout-${{ runner.arch }}-${{ github.ref }}-${{ github.sha }}
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
       - name: Run it
         uses: ./.github/actions/test_ios_rntester
         with:
@@ -377,6 +374,13 @@ jobs:
       matrix:
         jsengine: [Hermes, JSC]
     steps:
+      - name: Restore git cache
+        uses: actions/cache/restore@v4.0.0
+        with:
+          path: .git
+          key: v1-checkout-checkout-${{ runner.arch }}-${{ github.ref }}-${{ github.sha }}
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
       - name: Run it
         uses: ./.github/actions/test_ios_rntester
         with:
@@ -394,6 +398,13 @@ jobs:
         jsengine: [Hermes, JSC]
         architecture: [NewArch, OldArch]
     steps:
+      - name: Restore git cache
+        uses: actions/cache/restore@v4.0.0
+        with:
+          path: .git
+          key: v1-checkout-checkout-${{ runner.arch }}-${{ github.ref }}-${{ github.sha }}
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
       - name: Run it
         uses: ./.github/actions/test_ios_rntester
         with:
