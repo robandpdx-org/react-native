@@ -22,6 +22,9 @@ inputs:
   flavor:
     description: The flavor of the build. Must be one of "Debug", "Release".
     default: Debug
+  hermes_version:
+    description: The version of hermes
+    required: true
 runs:
   using: composite
   steps:
@@ -102,3 +105,61 @@ runs:
         fi
     - name: Setup xcode build cache
       uses: ./.github/actions/setup_xcode_build_cache
+      with:
+        hermes_version: ${{ inputs.hermes_version }}
+    - name: Install CocoaPods dependencies
+      shell: bash
+      run: |
+        if [[ << parameters.jsengine >> == "JSC" ]]; then
+          export USE_HERMES=0
+        fi
+
+        if [[ << parameters.use_frameworks >> == "DynamicFrameworks" ]]; then
+          export USE_FRAMEWORKS=dynamic
+        fi
+
+        if [[ << parameters.architecture >> == "NewArch" ]]; then
+          export RCT_NEW_ARCH_ENABLED=1
+        fi
+        
+        cd packages/rn-tester
+
+        bundle install
+        bundle exec pod install
+    - name: Build RNTester
+      if: ${{ inputs.run_unit_tests != true }}
+      shell: bash
+      run: |
+        xcodebuild build \
+          -workspace packages/rn-tester/RNTesterPods.xcworkspace \
+          -scheme RNTester \
+          -sdk iphonesimulator
+    - name: "Run Tests: iOS Unit and Integration Tests"
+      if: ${{ inputs.run_unit_tests == true }}
+      shell: bash
+      run: node ./scripts/circleci/run_with_retry.js 3 yarn test-ios
+    - name: Zip Derived data folder
+      if: ${{ inputs.run_unit_tests == true }}
+      shell: bash
+      run: |
+        echo "zipping tests results"
+        cd /Users/distiller/Library/Developer/Xcode
+        XCRESULT_PATH=$(find . -name '*.xcresult')
+        tar -zcvf xcresults.tar.gz $XCRESULT_PATH
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2.2.4
+      if: ${{ inputs.run_unit_tests == true }}
+      with:
+        name: xcresults
+        path: /Users/distiller/Library/Developer/Xcode/xcresults.tar.gz
+    - name: Report bundle size
+      if: ${{ inputs.run_unit_tests == true }}
+      uses: ./.github/actions/report_bundle_size
+      with:
+        platform: ios
+    - name: Store test results
+      if: ${{ inputs.run_unit_tests == true }}
+      uses: actions/upload-artifact@v2.2.4
+      with:
+        name: test-results
+        path: ./reports/junit
