@@ -4,16 +4,16 @@ inputs:
   jsengine:
     description: Which JavaScript engine to use. Must be one of "Hermes", "JSC".
     default: Hermes
-  use_frameworks:
+  use-frameworks:
       description: The dependency building and linking strategy to use. Must be one of "StaticLibraries", "DynamicFrameworks"
       default: StaticLibraries
   architecture:
     description: The React Native architecture to Test. RNTester has always Fabric enabled, but we want to run integration test with the old arch setup
     default: NewArch
-  ruby_version:
+  ruby-version:
     description: The version of ruby that must be used
     default: 2.6.10
-  run_unit_tests:
+  run-unit-tests:
     description: whether unit tests should run or not.
     default: false
   hermes-tarball-artifacts-dir:
@@ -22,8 +22,11 @@ inputs:
   flavor:
     description: The flavor of the build. Must be one of "Debug", "Release".
     default: Debug
-  hermes_version:
+  hermes-version:
     description: The version of hermes
+    required: true
+  react-native-version:
+    description: The version of react-native
     required: true
 runs:
   using: composite
@@ -37,17 +40,17 @@ runs:
       id: cache_setup
       uses: ./.github/actions/cache_setup
       with:
-        hermes-version: ${{ needs.prepare_hermes_workspace.outputs.hermes-version }}
-        react-native-version: ${{ needs.prepare_hermes_workspace.outputs.react-native-version }}
+        hermes-version: ${{ inputs.hermes-version }}
+        react-native-version: ${{ inputs.react-native-version }}
     - name: Delete iOS Simulators
       shell: bash
       run: sudo rm -rf /Library/Developer/CoreSimulator/Profiles/Runtimes/ &
     - name: Setup ruby
       uses: ruby/setup-ruby@v1.170.0
       with:
-        ruby-version: ${{ inputs.ruby_version }}
+        ruby-version: ${{ inputs.ruby-version }}
     - name: Prepare IOS Tests
-      if: ${{ inputs.run_unit_tests == true }}
+      if: ${{ inputs.run-unit-tests == true }}
       uses: ./.github/actions/prepare_ios_tests
     - name: Set HERMES_ENGINE_TARBALL_PATH envvar if Hermes tarball is present
       shell: bash
@@ -94,19 +97,19 @@ runs:
     - name: Setup xcode build cache
       uses: ./.github/actions/setup_xcode_build_cache
       with:
-        hermes_version: ${{ inputs.hermes_version }}
+        hermes-version: ${{ inputs.hermes-version }}
     - name: Install CocoaPods dependencies
       shell: bash
       run: |
-        if [[ << parameters.jsengine >> == "JSC" ]]; then
+        if [[ ${{ inputs.jsengine }} == "JSC" ]]; then
           export USE_HERMES=0
         fi
 
-        if [[ << parameters.use_frameworks >> == "DynamicFrameworks" ]]; then
+        if [[ ${{ inputs.use-frameworks }} == "DynamicFrameworks" ]]; then
           export USE_FRAMEWORKS=dynamic
         fi
 
-        if [[ << parameters.architecture >> == "NewArch" ]]; then
+        if [[ ${{ inputs.architecture }} == "NewArch" ]]; then
           export RCT_NEW_ARCH_ENABLED=1
         fi
         
@@ -115,7 +118,7 @@ runs:
         bundle install
         bundle exec pod install
     - name: Build RNTester
-      if: ${{ inputs.run_unit_tests != true }}
+      if: ${{ inputs.run-unit-tests != true }}
       shell: bash
       run: |
         xcodebuild build \
@@ -123,11 +126,11 @@ runs:
           -scheme RNTester \
           -sdk iphonesimulator
     - name: "Run Tests: iOS Unit and Integration Tests"
-      if: ${{ inputs.run_unit_tests == true }}
+      if: ${{ inputs.run-unit-tests == true }}
       shell: bash
       run: node ./scripts/circleci/run_with_retry.js 3 yarn test-ios
     - name: Zip Derived data folder
-      if: ${{ inputs.run_unit_tests == true }}
+      if: ${{ inputs.run-unit-tests == true }}
       shell: bash
       run: |
         echo "zipping tests results"
@@ -136,17 +139,17 @@ runs:
         tar -zcvf xcresults.tar.gz $XCRESULT_PATH
     - name: Upload artifact
       uses: actions/upload-artifact@v2.2.4
-      if: ${{ inputs.run_unit_tests == true }}
+      if: ${{ inputs.run-unit-tests == true }}
       with:
         name: xcresults
         path: /Users/distiller/Library/Developer/Xcode/xcresults.tar.gz
     - name: Report bundle size
-      if: ${{ inputs.run_unit_tests == true }}
+      if: ${{ inputs.run-unit-tests == true }}
       uses: ./.github/actions/report_bundle_size
       with:
         platform: ios
     - name: Store test results
-      if: ${{ inputs.run_unit_tests == true }}
+      if: ${{ inputs.run-unit-tests == true }}
       uses: actions/upload-artifact@v2.2.4
       with:
         name: test-results
