@@ -36,6 +36,9 @@ runs:
       with:
         node-version: 18
         cache: 'yarn'
+    - name: Run yarn
+      shell: bash
+      run: yarn install --non-interactive
     - name: Cache setup
       id: cache_setup
       uses: ./.github/actions/cache_setup
