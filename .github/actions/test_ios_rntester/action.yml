@@ -66,7 +66,7 @@ runs:
           exit 0
         fi
 
-        TARBALL_FILENAME=$(node ~/react-native/packages/react-native/scripts/hermes/get-tarball-name.js --buildType "${{ inputs.flavor }}")
+        TARBALL_FILENAME=$(node ./packages/react-native/scripts/hermes/get-tarball-name.js --buildType "${{ inputs.flavor }}")
         TARBALL_PATH=$HERMES_TARBALL_ARTIFACTS_DIR/$TARBALL_FILENAME
 
         echo "Looking for $TARBALL_FILENAME in $HERMES_TARBALL_ARTIFACTS_DIR"
@@ -83,7 +83,7 @@ runs:
       shell: bash
       run: |
         HERMES_TARBALL_ARTIFACTS_DIR=${{ inputs.hermes-tarball-artifacts-dir }}
-        TARBALL_FILENAME=$(node ~/react-native/packages/react-native/scripts/hermes/get-tarball-name.js --buildType "${{ inputs.flavor }}")
+        TARBALL_FILENAME=$(node ./packages/react-native/scripts/hermes/get-tarball-name.js --buildType "${{ inputs.flavor }}")
         TARBALL_PATH=$HERMES_TARBALL_ARTIFACTS_DIR/$TARBALL_FILENAME
         if [[ -e $TARBALL_PATH ]]; then
           tar -xf $TARBALL_PATH
