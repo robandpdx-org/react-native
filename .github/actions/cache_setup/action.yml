@@ -78,3 +78,4 @@ runs:
           /tmp/hermes/download/
           /tmp/hermes/hermes/
         key: v5-hermes-${{ github.run_number }}-${{ inputs.hermes-version }}
+        enableCrossOsArchive: true
