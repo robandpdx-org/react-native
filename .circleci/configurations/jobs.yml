@@ -1093,6 +1093,7 @@ jobs:
             New-Item -ItemType Directory $Env:HERMES_WS_DIR\icu
             New-Item -ItemType Directory $Env:HERMES_WS_DIR\deps
             New-Item -ItemType Directory $Env:HERMES_WS_DIR\win64-bin
+            New-Item -ItemType Directory tmp\hermes\hermes
             New-Item -ItemType SymbolicLink -Target tmp\hermes\hermes -Path $Env:HERMES_WS_DIR -Name hermes
       - run:
           name: Build HermesC for Windows
