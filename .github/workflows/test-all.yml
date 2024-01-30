@@ -500,7 +500,7 @@ jobs:
             D:\tmp\hermes\hermes\build_release\
       - name: Set up workspace
         run: |
-          New-Item -ItemType Directory $Env:HERMES_WS_DIR
+          #New-Item -ItemType Directory $Env:HERMES_WS_DIR
           New-Item -ItemType Directory $Env:HERMES_WS_DIR\icu
           New-Item -ItemType Directory $Env:HERMES_WS_DIR\deps
           New-Item -ItemType Directory $Env:HERMES_WS_DIR\win64-bin
