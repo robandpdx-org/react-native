@@ -471,7 +471,7 @@ jobs:
     runs-on: windows-latest
     needs: prepare_hermes_workspace
     env:
-      HERMES_WS_DIR: 'C:\tmp\hermes'
+      HERMES_WS_DIR: 'D:\tmp\hermes'
       ICU_URL: "https://github.com/unicode-org/icu/releases/download/release-64-2/icu4c-64_2-Win64-MSVC2017.zip"
       MSBUILD_DIR: 'C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin'
       CMAKE_DIR: 'C:\Program Files\CMake\bin'
@@ -494,10 +494,10 @@ jobs:
         with:
           key: v2-hermes-${{ github.job }}-windows-${{ needs.prepare_hermes_workspace.outputs.hermes-version }}-${{ needs.prepare_hermes_workspace.outputs.react-native-version }}
           path: |
-            C:\tmp\hermes\win64-bin\
-            C:\tmp\hermes\hermes\icu\
-            C:\tmp\hermes\hermes\deps\
-            C:\tmp\hermes\hermes\build_release\
+            D:\tmp\hermes\win64-bin\
+            D:\tmp\hermes\hermes\icu\
+            D:\tmp\hermes\hermes\deps\
+            D:\tmp\hermes\hermes\build_release\
       - name: Set up workspace
         run: |
           New-Item -ItemType Directory $Env:HERMES_WS_DIR
