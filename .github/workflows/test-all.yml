@@ -468,7 +468,7 @@ jobs:
           name: linux-artifacts
           path: /tmp/hermes/linux64-bin
   build_hermesc_windows:
-    runs-on: windows-latest
+    runs-on: windows-2019
     needs: prepare_hermes_workspace
     env:
       HERMES_WS_DIR: 'D:\tmp\hermes'
@@ -498,6 +498,8 @@ jobs:
             D:\tmp\hermes\hermes\icu\
             D:\tmp\hermes\hermes\deps\
             D:\tmp\hermes\hermes\build_release\
+      - name: setup-msbuild
+        uses: microsoft/setup-msbuild@v1.3.2
       - name: Set up workspace
         run: |
           #New-Item -ItemType Directory $Env:HERMES_WS_DIR
