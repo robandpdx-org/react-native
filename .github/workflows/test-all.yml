@@ -369,8 +369,8 @@ jobs:
       - name: Run it
         uses: ./.github/actions/test_ios_rntester
         with:
-          ruby_version: "3.2.0"
-          hermes_version: ${{ needs.prepare_hermes_workspace.outputs.hermes-version }}
+          ruby-version: "3.2.0"
+          hermes-version: ${{ needs.prepare_hermes_workspace.outputs.hermes-version }}
           react-native-version: ${{ needs.prepare_hermes_workspace.outputs.react-native-version }}
   test_ios_rntester1:
     runs-on: macos-12
