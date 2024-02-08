@@ -20,6 +20,7 @@ jobs:
         run: |
           LATEST=false
           DRYRUN=true
+          CIRCLE_BRANCH=$GITHUB_REF_NAME
           VERSION=$(grep '"version"' package.json | cut -d '"' -f 4 | head -1)
           echo "Using the version from the package.json: $VERSION"
           node ./scripts/releases-ci/prepare-package-for-release.js -v "$VERSION" -l $LATEST --dry-run $DRYRUN
