@@ -662,6 +662,8 @@ jobs:
         with:
           name: hermes-osx-bin-Debug
           path: /tmp/hermes/osx-bin
+      - name: Show osx-bin directory
+        run: ls -lR /tmp/hermes/osx-bin
       - name: Cache setup
         id: cache_setup
         uses: ./.github/actions/cache_setup
