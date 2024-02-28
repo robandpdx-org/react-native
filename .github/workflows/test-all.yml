@@ -315,6 +315,11 @@ jobs:
           mkdir -p /tmp/hermes/osx-bin/${{ matrix.flavor }}
           cp ./packages/react-native/sdks/hermes/build_macosx/bin/* /tmp/hermes/osx-bin/${{ matrix.flavor }}
           ls -lR /tmp/hermes/osx-bin/
+      - name: Upload darwin artifacts
+        uses: actions/upload-artifact@v4.3.1
+        with:
+          name: hermes-darwin-bin-${{ matrix.flavor }}
+          path: /tmp/hermes/hermes-runtime-darwin
       - name: Upload osx-bin
         uses: actions/upload-artifact@v4.3.1
         with:
@@ -664,6 +669,16 @@ jobs:
         with:
           name: hermes-osx-bin-Debug
           path: /tmp/hermes/osx-bin
+      - name: Download darwin-bin release artifacts
+        uses: actions/download-artifact@v4.1.3
+        with:
+          name: hermes-darwin-bin-Release
+          path: /tmp/hermes/hermes-runtime-darwin
+      - name: Download darwin-bin debug artifacts
+        uses: actions/download-artifact@v4.1.3
+        with:
+          name: hermes-darwin-bin-Debug
+          path: /tmp/hermes/hermes-runtime-darwin
       - name: Download windows-bin artifacts
         uses: actions/download-artifact@v4.1.3
         with:
