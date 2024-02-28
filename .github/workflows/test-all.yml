@@ -688,12 +688,12 @@ jobs:
         uses: actions/download-artifact@v4.1.3
         with:
           name: hermes-dSYM-Debug
-          path: /tmp/hermes/dSYM
+          path: /tmp/hermes/dSYM/Debug
       - name: Download hermes dSYM release vartifacts
         uses: actions/download-artifact@v4.1.3
         with:
           name: hermes-dSYM-Release
-          path: /tmp/hermes/dSYM
+          path: /tmp/hermes/dSYM/Release
       - name: Download windows-bin artifacts
         uses: actions/download-artifact@v4.1.3
         with:
