@@ -510,10 +510,12 @@ jobs:
 
             cmake -S hermes -B build_release -G 'Visual Studio 16 2019' -Ax64 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=True -DHERMES_ENABLE_WIN10_ICU_FALLBACK=OFF
             if (-not $?) { throw "Failed to configure Hermes" }
+            echo "Running windows build..."
             cd build_release
             cmake --build . --target hermesc --config Release
             if (-not $?) { throw "Failed to build Hermes" }
 
+            echo "Copying hermesc.exe to win64-bin"
             cd $Env:HERMES_WS_DIR
             Copy-Item -Path "build_release\bin\Release\hermesc.exe" -Destination "win64-bin"
             # Include Windows runtime dependencies
