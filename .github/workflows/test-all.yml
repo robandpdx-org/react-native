@@ -590,7 +590,7 @@ jobs:
         uses: gradle/gradle-build-action@v3.0.0-rc.2
       - name: Build and publish all the Android Artifacts to /tmp/maven-local
         run: |
-          if [[ ${{ needs.set_release_type.outputs.RELEASE_TYPE }} == "dry-run" ]]; then
+          if [[ "${{ needs.set_release_type.outputs.RELEASE_TYPE }}" == "dry-run" ]]; then
             export ORG_GRADLE_PROJECT_reactNativeArchitectures="arm64-v8a"
           else
             export ORG_GRADLE_PROJECT_reactNativeArchitectures="armeabi-v7a,arm64-v8a,x86,x86_64"
