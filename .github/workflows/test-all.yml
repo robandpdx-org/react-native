@@ -19,7 +19,7 @@ jobs:
       REF: ${{ github.ref }}
     steps:
       - id: set_release_type
-        run:
+        run: |
           if [[ $EVENT_NAME == "schedule" ]]; then
             echo "Setting release type to nightly"
             echo "RELEASE_TYPE=nightly" >> $GITHUB_OUTPUT
