@@ -13,5 +13,5 @@ runs:
   using: composite
   steps:
     - name: "Run Tests: ${{ inputs.platform }} End-to-End Tests"
-      run: node ./scripts/run-ci-e2e-tests.js --${{ inputs.platform }} --retries ${{ inputs.retries }}
+      run: node ./scripts/e2e/run-ci-e2e-tests.js --${{ inputs.platform }} --retries ${{ inputs.retries }}
       shell: bash
