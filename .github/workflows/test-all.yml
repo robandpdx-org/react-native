@@ -587,7 +587,9 @@ jobs:
       - name: Set React Native Version
         run: node ./scripts/releases/set-rn-version.js --build-type ${{ needs.set_release_type.outputs.RELEASE_TYPE }}
       - name: Setup gradle
-        uses: gradle/gradle-build-action@v3.0.0-rc.2
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.6
       - name: Build and publish all the Android Artifacts to /tmp/maven-local
         run: |
           if [[ "${{ needs.set_release_type.outputs.RELEASE_TYPE }}" == "dry-run" ]]; then
