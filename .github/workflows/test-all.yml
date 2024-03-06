@@ -31,7 +31,7 @@ jobs:
             echo "RELEASE_TYPE=dry-run" >> $GITHUB_OUTPUT
           fi
   prepare_package_for_release:
-    runs-on: macos-12
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@v4.1.1
       - name: Use Node.js 18
@@ -109,7 +109,7 @@ jobs:
           echo ${{ steps.hermes-version.outputs.version }}
       
   build_hermesc_apple:
-    runs-on: macos-12
+    runs-on: macos-13
     needs: prepare_hermes_workspace
     env:
       HERMES_WS_DIR: /tmp/hermes
@@ -138,7 +138,7 @@ jobs:
           . ./utils/build-apple-framework.sh
           build_host_hermesc_if_needed
   build_apple_slices_hermes:
-    runs-on: macos-12
+    runs-on: macos-13
     needs: [build_hermesc_apple, prepare_hermes_workspace]
     env:
       HERMES_WS_DIR: /tmp/hermes
@@ -224,7 +224,7 @@ jobs:
           path: ./packages/react-native/sdks/hermes/build_${{ matrix.slice }}_${{ matrix.flavor }}
           key: v4-hermes-apple-${{ needs.prepare_hermes_workspace.outputs.hermes-version }}-${{ needs.prepare_hermes_workspace.outputs.react-native-version }}-${{ hashfiles('packages/react-native/sdks/hermes-engine/utils/build-apple-framework.sh') }}-${{ matrix.slice }}-${{ matrix.flavor }}
   build_hermes_macos:
-    runs-on: macos-12
+    runs-on: macos-13
     needs: [build_apple_slices_hermes, prepare_hermes_workspace]
     env:
       HERMES_WS_DIR: /tmp/hermes
@@ -237,6 +237,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.1
+      - name: Setup xcode
+        uses: maxim-lobanov/setup-xcode@v1.6.0
+        with:
+          xcode-version: 14.3.1
       - name: Use Node.js 18
         uses: actions/setup-node@v4.0.0
         with:
@@ -380,7 +384,7 @@ jobs:
           name: hermes-dSYM-${{ matrix.flavor }}
           path: /tmp/hermes/dSYM/${{ matrix.flavor }}
   test_ios_rntester_ruby_3_2_0:
-    runs-on: macos-12
+    runs-on: macos-13
     needs: [build_apple_slices_hermes, prepare_hermes_workspace, build_hermes_macos]
     env:
       HERMES_WS_DIR: /tmp/hermes
@@ -395,7 +399,7 @@ jobs:
           hermes-version: ${{ needs.prepare_hermes_workspace.outputs.hermes-version }}
           react-native-version: ${{ needs.prepare_hermes_workspace.outputs.react-native-version }}
   test_ios_rntester1:
-    runs-on: macos-12
+    runs-on: macos-13
     needs: [build_apple_slices_hermes, prepare_hermes_workspace, build_hermes_macos]
     env:
       HERMES_WS_DIR: /tmp/hermes
@@ -416,7 +420,7 @@ jobs:
           hermes-version: ${{ needs.prepare_hermes_workspace.outputs.hermes-version }}
           react-native-version: ${{ needs.prepare_hermes_workspace.outputs.react-native-version }}
   test_ios_rntester2:
-    runs-on: macos-12
+    runs-on: macos-13
     needs: [build_apple_slices_hermes, prepare_hermes_workspace, build_hermes_macos]
     env:
       HERMES_WS_DIR: /tmp/hermes
