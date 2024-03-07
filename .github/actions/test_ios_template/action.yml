@@ -1,0 +1,90 @@
+name: test_ios_template
+description: Test iOS Template
+inputs:
+  jsengine:
+    description: Which JavaScript engine to use. Must be one of "Hermes", "JSC".
+    default: Hermes
+  use-frameworks:
+      description: The dependency building and linking strategy to use. Must be one of "StaticLibraries", "DynamicFrameworks"
+      default: StaticLibraries
+  architecture:
+    description: The React Native architecture to Test. RNTester has always Fabric enabled, but we want to run integration test with the old arch setup
+    default: OldArch
+  ruby-version:
+    description: The version of ruby that must be used
+    default: 2.6.10
+  flavor:
+    description: The flavor of the build. Must be one of "Debug", "Release".
+    default: Debug
+  hermes-version:
+    description: The version of hermes
+    required: true
+  react-native-version:
+    description: The version of react-native
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Setup xcode
+      uses: maxim-lobanov/setup-xcode@v1.6.0
+      with:
+        xcode-version: 14.3.1
+    - name: Use Node.js 18
+      uses: actions/setup-node@v4.0.0
+      with:
+        node-version: 18
+        cache: 'yarn'
+    - name: Cache setup
+      id: cache_setup
+      uses: ./.github/actions/cache_setup
+      with:
+        hermes-version: ${{ inputs.hermes-version }}
+        react-native-version: ${{ inputs.react-native-version }}
+    - name: Setup Hermes workspace
+      uses: ./.github/actions/setup_hermes_workspace
+    - name: Setup ruby
+      uses: actions/setup-ruby@v1.1.3
+      with:
+        ruby-version: ${{ inputs.ruby-version }}
+    - name: Set HERMES_ENGINE_TARBALL_PATH
+      if: inputs.jsengine == 'Hermes'
+      shell: bash
+      run: |
+        BUILD_TYPE="${{ inputs.flavor }}"
+        TARBALL_FILENAME=$(node ./packages/react-native/scripts/hermes/get-tarball-name.js --buildType "$BUILD_TYPE")
+        echo "export HERMES_ENGINE_TARBALL_PATH=$HERMES_WS_DIR/hermes-runtime-darwin/$TARBALL_FILENAME" >> $GITHUB_ENV
+    - name: Create iOS template project
+      shell: bash
+      run: |
+        PACKAGE=$(cat build/react-native-package-version)
+        PATH_TO_PACKAGE="$GITHUB_WORKSPACE/build/$PACKAGE"
+        node ./scripts/releases/update-template-package.js "{\"react-native\":\"file:$PATH_TO_PACKAGE\"}"
+        node ./scripts/e2e/init-template-e2e.js --projectName $PROJECT_NAME --templatePath "$REPO_ROOT/packages/react-native" --directory "/tmp/$PROJECT_NAME" --verbose
+    - name: Install iOS dependencies - Configuration ${{ matrix.flavor }}; New Architecture ${{ matrix.architecture }}; JS Engine ${{ matrix.jsengine }}
+      shell: bash
+      run: |
+        cd /tmp/$PROJECT_NAME/ios
+
+        if [[ ${{ matrix.architecture }} == "NewArch" ]]; then
+          export RCT_NEW_ARCH_ENABLED=1
+        fi
+
+        if [[ ${{ matrix.jsengine }} == "JSC" ]]; then
+          export USE_HERMES=0
+        fi
+
+        if [[ ${{ matrix.use-frameworks }} == "DynamicFrameworks" ]]; then
+          export USE_FRAMEWORKS=dynamic
+        fi
+
+        cd ..
+        bundle install
+        bundle exec pod install --project-directory=ios
+    - name: Build template project
+      shell: bash
+      run: |
+        xcodebuild build \
+          -configuration ${{ matrix.flavor }} \
+          -workspace /tmp/$PROJECT_NAME/ios/$PROJECT_NAME.xcworkspace \
+          -scheme $PROJECT_NAME \
+          -sdk iphonesimulator
